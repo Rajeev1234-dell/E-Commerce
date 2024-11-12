@@ -1,13 +1,25 @@
-import { hashPassword } from "../utils/hashPassword.js";
+import User from "../models/user.model.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
-  // const pass = await hashPassword(password);
-  // console.log(pass);
+  try {
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      const error = new Error("User already exists");
+      error.status = 400;
+      return next(error);
+    }
 
-  // res.json({ name: name, email: email, password: pass });
-  res.send("Signup route");
+    const user = await User.create({ name, email, password });
+
+    res
+      .status(201)
+      .json({ success: true, user, message: "User created successfully" });
+  } catch (error) {
+    next(error);
+  }
 };
+
 export const login = async (req, res) => {
   res.send("Login route");
 };
