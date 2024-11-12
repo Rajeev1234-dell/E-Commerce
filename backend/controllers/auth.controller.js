@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import generateToken from "../utils/generateToken.js";
 
 export const signup = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -11,6 +12,8 @@ export const signup = async (req, res, next) => {
     }
 
     const user = await User.create({ name, email, password });
+
+    const { accessToken, refreshToken } = generateToken(user._id);
 
     res
       .status(201)
